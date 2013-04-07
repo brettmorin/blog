@@ -1,0 +1,114 @@
+16/3/2013 - Started free internet course
+3/4/2013  - Finished course
+3/4/2013  - Blog - Created view_home_page.feature:
+    =begin
+      Alright.  An off-the-hip overview:
+      1) Show a home page locally with a posts placeholder
+      2) Format basic page divisions on home page
+      3) Load a single post in entirety on the home page
+      4) Add create post page, save to file
+      5) Show created post on home page (reverse chron.)
+      6) Replace post file with dev. db with post table
+      
+    =end
+    Feature: View Home Page
+      Scenario:  Successfully browse to home page
+        Given web browser is launched
+        When I browse to home page URL
+        Then the output should be the home page
+4/4/2013  - Blog - Git repo:
+  $ git add . && git commit -m "first commit"
+  - Created git repo at brettmorin/blog
+  $ git remote add origin git@github-personal:brettmorin/blog.git 
+4/4/2013  - Blog - Setup for home page:
+  - Switch to new git branch "HomePage"
+  $ git checkout -b HomePage
+  - Bundle error trying to install Gemfile gems, fix with update:
+  $ update --system
+  - system already up to date
+  $ gem install bundler
+  - successfully installed
+  - Follow setup as on cucumber book pages 204-205
+  $ bundle init
+  - Gemfile:
+    source "https://rubygems.org"
+
+    gem "sinatra"
+    gem "cucumber"
+    gem "rspec"
+    gem "rack-test"
+  $ bundle
+  - successful
+  $ geany blog_app.rb
+    require 'sinatra'
+
+    class BlogApp < Sinatra::Base
+      set :data, ''
+    end
+  $ cd features/
+  $ mkdir support
+  $ cd support
+4/5/2013 - Blog - Following exerpt of Cucumber Recipes book (on order)
+  $ geany env.rb
+    require File.join(File.dirname(__File__), '..', '..', 'blog_app')
+  $ geany blog_app.rb
+  - refactor - don't need data symbol as it is specific to book example
+    require 'sinatra'
+
+    class BlogApp < Sinatra::Base
+
+    end
+  $ geany Gemfile
+  - add capybara
+    source "https://rubygems.org"
+
+    gem "sinatra"
+    gem "cucumber"
+    gem "rspec"
+    gem "rack-test"
+    gem "capybara"
+4/6/2013 - Blog - Following tutorial http://loudcoding.com/posts/quick-tutorial-starting-with-cucumber-and-capybara-bdd-on-rails-project/
+  $ geany features/view_home_page.feature
+  - re-factor to change wording
+    Feature: View Home Page
+      Scenario:  Home page should say "Blog Home"
+        When I visit the home page
+        Then I should see "Blog Home"
+  $ geany features/step_definitions/home_page_steps
+  - re-factor
+    require File.expand_path(File.join(File.dirname(__FILE__), "..", "support", "paths"))
+
+    When /^I view the home page$/ do |page_name|
+      visit path_to(page_name)
+    end
+
+    Then /^I should see "([^\"]*)"$/ do |text|
+      page.should have_content(text)
+    end
+  $ touch features/support/paths.rb
+  $ geany features/support/paths.rb
+    module NavigationHelpers
+      def path_to(page_name)
+        case page_name
+     
+        when /the home\s?page/
+          '/'
+        else
+          begin
+            page_name =~ /the (.*) page/
+            path_components = $1.split(/\s+/)
+            self.send(path_components.push('path').join('_').to_sym)
+          rescue Object => e
+            raise "Can't find mapping from \"#{page_name}\" to a path.\n" +
+              "Now, go and add a mapping in #{__FILE__}"
+          end
+        end
+      end
+    end
+
+    World(NavigationHelpers)
+  $ cucumber
+  - boom! -doesn't like my post_steps.rb posts (multiline texts)
+  - replaced code sections of posts that contained #{ } with \#{ }
+  $ cucumber
+  - success

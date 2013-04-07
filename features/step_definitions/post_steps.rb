@@ -37,17 +37,27 @@ Given /^this post:$/ do |table|
   post = Post.new(post_hash['title'],post_hash['content'])
 end
 
-Given /^blog contains post "(.*?)"$/ do |original_post|
-  my_blog.add_post(original_post)
-  my_blog.content.should eq(original_post),"Expected the blog contents to be #{original_post} but it was #{my_blog.content}"
-end
-
 When /^I submit this post "(.*?)"$/ do |new_post|
   my_blog.add_post(new_post)
 end
 
 Then /^output should be "(.*?)"$/ do |combined_posts|
   my_blog.content.should eq(combined_posts),"Expected the blog contents to be #{combined_posts} but it was #{my_blog.content}"
+end
+
+#view_posts.feature
+Given /^blog contains post "(.*?)"$/ do |original_post|
+  my_blog.add_post(original_post)
+  my_blog.content.should eq(original_post),"Expected the blog contents to be #{original_post} but it was #{my_blog.content}"
+end
+Given /^blog contains posts titled "Post 1" and "Post 2"$/ do
+  pending "view posts to do"
+end
+When /^I view all posts$/ do
+  pending "view posts to do"
+end
+Then /^the output should be "Post 2. \\n Post 1." $/ do
+  pending "view posts to do"
 end
 post1 = <<-POST1
            First steps to Outside-In blog creation:
@@ -183,7 +193,7 @@ post3 = <<-POST3
             POM 2: When and Then steps 
               i) Need to check original blog contents
               ii) Add assertion to Given:
-                  my_blog.content.should eq(post), "Expected the content to be #{post} but it was #{my_blog.content}
+                  my_blog.content.should eq(post), "Expected the content to be \#{post} but it was \#{my_blog.content}
               iii) Add content method to class:
                   class Blog
                     def add_post(post)
@@ -235,7 +245,7 @@ post3 = <<-POST3
                   Given /^blog contains post "(.*?)"$/ do |post|
                     @my_blog = Blog.new
                     @my_blog.add_post(post)
-                    @my_blog.content.should eq(post), "Expected the content to be #{post} but it was #{@my_blog.content}
+                    @my_blog.content.should eq(post), "Expected the content to be \#{post} but it was \#{@my_blog.content}
                   end
                   When /^I add post "(.*?)"$/ do |new_post|
                     @my_blog.add_post(new_post)
@@ -256,7 +266,7 @@ post3 = <<-POST3
                   Given /^blog contains post "(.*?)"$/ do |post|
                     my_blog.new
                     my_blog.add_post(post)
-                    my_blog.content.should eq(post),"Expected the blog contents to be #{post} but it was #{my_blog.content}"
+                    my_blog.content.should eq(post),"Expected the blog contents to be \#{post} but it was \#{my_blog.content}"
                   end
 
                   When /^I add post "(.*?)"$/ do |new_post|
@@ -270,13 +280,13 @@ post3 = <<-POST3
               xviii) Remove instantiation from Given for my_blog (done in module):
                     Given /^blog contains post "(.*?)"$/ do |post|
                       my_blog.add_post(post)
-                      my_blog.content.should eq(post),"Expected the blog contents to be #{post} but it was #{my_blog.content}"
+                      my_blog.content.should eq(post),"Expected the blog contents to be \#{post} but it was \#{my_blog.content}"
                     end
               xix) $cucumber -> 2 passed, 1 pending
               xx) Refactor to change working for step args:
                   Given /^blog contains post "(.*?)"$/ do |original_post|
                     my_blog.add_post(original_post)
-                    my_blog.content.should eq(original_post),"Expected the blog contents to be #{original_post} but it was #{my_blog.content}"
+                    my_blog.content.should eq(original_post),"Expected the blog contents to be \#{original_post} but it was \#{my_blog.content}"
                   end
 
                   When /^I add post "(.*?)"$/ do |new_post|
@@ -289,7 +299,7 @@ post3 = <<-POST3
               xxi) $cucumber -> 2 passed, 1 pending
               xxii) Replace pending with assertion in Then step
                     Then /^output should be "(.*?)"$/ do |combined_posts|
-                      my_blog.content.should eq(combined_posts),"Expected the blog contents to be #{combined_posts} but it was #{my_blog.content}"
+                      my_blog.content.should eq(combined_posts),"Expected the blog contents to be \#{combined_posts} but it was \#{my_blog.content}"
                     end
               xxiii) $cucumber -> 3 passed
            POST3
