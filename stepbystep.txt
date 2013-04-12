@@ -112,3 +112,8 @@
   - replaced code sections of posts that contained #{ } with \#{ }
   $ cucumber
   - success
+  $ git add . && git commit -m "Home page features run without errors but with definitions to do"
+  $ git checkout master
+  $ git merge HomePage
+  $ git push -u origin master
+  

@@ -1,7 +1,12 @@
 source "https://rubygems.org"
 
 gem "sinatra"
+gem "sinatra-reloader"
+gem "sinatra-flash"
+gem "thin"
+gem "foreman"
 gem "cucumber"
 gem "rspec"
 gem "rack-test"
 gem "capybara"
+gem "httparty"
