@@ -12,3 +12,6 @@ Feature: View Home Page
     When I visit the home page
     Then I should see "Blog Home"
     
+  Scenario: Home page should have post section
+    When I visit the home page
+    Then it should have a post section

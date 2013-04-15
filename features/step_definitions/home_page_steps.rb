@@ -1,3 +1,5 @@
+sections = Hash["post" => "col-2-3"]
+
 require File.expand_path(File.join(File.dirname(__FILE__), "..", "support", "paths"))
 
 When /^I visit (.+)$/ do |page_name|
@@ -6,6 +8,10 @@ end
 
 Then /^I should see "([^\"]*)"$/ do |text|
   page.should have_content(text)
+end
+
+Then /^it should have a (.+) section$/ do |section|
+  page.should have_css("div." + sections[section])
 end
 
 

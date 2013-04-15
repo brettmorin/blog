@@ -67,6 +67,16 @@
     gem "rspec"
     gem "rack-test"
     gem "capybara"
+  $ geany env.rb
+  - refactor
+    require File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "blog_app"))
+
+    require "capybara"
+    require "capybara/cucumber"
+     
+    World do
+      Capybara.app = Boiblog::BlogApp 
+    end
 4/6/2013 - Blog - Following tutorial http://loudcoding.com/posts/quick-tutorial-starting-with-cucumber-and-capybara-bdd-on-rails-project/
   $ geany features/view_home_page.feature
   - re-factor to change wording
@@ -112,8 +122,118 @@
   - replaced code sections of posts that contained #{ } with \#{ }
   $ cucumber
   - success
-  $ git add . && git commit -m "Home page features run without errors but with definitions to do"
+  $ git add . && git commit
   $ git checkout master
   $ git merge HomePage
   $ git push -u origin master
-  
+4/11/2013 - Blog - Following tutorial http://testerstories.com/?p=898
+  - In violation of test-first, I will add some code I might use later since I just read about it
+  - Added config.ru and Procfile for rackup run but will need to add this to cucumber if I wish to use it
+  - refer to foreman use and look into https://github.com/guard/guard-spork when using
+  $ geany config.ru
+    require './blog_app'
+    run Boiblog::BlogApp
+  $ geany Procfile
+    web: bundle exec rackup config.ru -p $PORT
+  - inflated blog_app.rb with rackup code, module and sinatra-reloader and sinatra-flash references
+  - this is from site: http://testerstories.com/?p=898
+  - All this extra code is part of a learning process and wouldn't normally be put in during TDD at this point as it has no test driver
+  $ geany blog_app.rb
+    require 'sinatra/base'
+    require 'sinatra/reloader'
+
+    module Boiblog
+      class BlogApp < Sinatra::Base
+        register Sinatra::Reloader
+        
+        get '/' do
+          erb :home
+        end
+        
+        post '/' do
+          "You said '#{params[:message]}'."
+        end
+      end
+    end
+
+    if __FILE__ == $0
+      Boiblog::BlogApp.run! port: 9292
+    end
+  $ geany views/home.erb
+  - Capybara, before v 2.1 can't inspect <head><title> element, so put text in body to test for
+    <!doctype html>
+    <html>
+    <head>
+      <title>Blog Home</title>
+    </head>
+    <body>
+    Blog Home
+    </body>
+    </html>
+  $ cucumber
+  - scenario passed
+  $ git add . && git commit -m "View Home Page scenario 1 complete"
+  $ git push -u origin master
+4/14/2013 - Blog - Add post section to page
+  $ geany features/view_home_page.feature
+  - Add scenario to test for css div that will hold posts
+    Scenario: Home page should have post section
+      When I visit the home page
+      Then it should have a post section
+  $ geany features/step_definitions/home_page_steps.rb
+  - When statement is a duplicate so just add step def for Then statement:
+    Then /^it should have a (.+) section$/ do |section|
+      page.should have_css("div.content_area")
+    end
+  - Originally put page.have_css? but that was always true, so I switched 
+  $ cucumber
+  - step failed as expected since no css was added to home.erb
+  $ mkdir public/css/
+  $ geany public/css/style.css
+  - got this css grid idea from http://css-tricks.com/dont-overthink-it-grids/
+    [class*='col-'] {
+      float: left;
+    }
+  $ geany views/home.erb
+  - add reference to style.css and meta tags and divs for grid and columns
+    <!doctype html>
+    <html>
+    <head>
+      <title>Blog Home</title>
+      <meta http-equiv="Content-Language" content="English" />
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+      <link rel="stylesheet" type="text/css" href="/css/style.css" media="screen" />
+    </head>
+    <body>
+    <h1>Blog Home</h1>
+    <div class="grid">
+      <div class="col-2-3">
+         Main Content
+      </div>
+      <div class="col-1-3">
+         Sidebar
+      </div>
+    </div>
+    </body>
+    </html>
+  $ geany features/step_definitions/home_page_steps.rb
+  - refactor for css class name change and add hash at the top to bridge technical name with feature wording
+    sections = Hash["post" => "col-2-3"]
+
+    require File.expand_path(File.join(File.dirname(__FILE__), "..", "support", "paths"))
+
+    When /^I visit (.+)$/ do |page_name|
+      visit path_to(page_name)
+    end
+
+    Then /^I should see "([^\"]*)"$/ do |text|
+      page.should have_content(text)
+    end
+
+    Then /^it should have a (.+) section$/ do |section|
+      page.should have_css("div." + sections[section])
+    end
+  $ cucumber
+  - passed
+  $ git add . && git commit -m "View Home Page scenario 2 (css test) complete"
+  $ git push -u origin master
